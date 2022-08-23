@@ -358,13 +358,21 @@ async def cb_handler(client: Client, query: CallbackQuery):
                 await query.answer(url=f"https://t.me/{temp.U_NAME}?start={ident}_{file_id}")
                 return
             else:
-                await client.send_cached_media(
+                 adlt = await client.send_cached_media(
                     chat_id=query.from_user.id,
                     file_id=file_id,
                     caption=f_caption,
                     protect_content=True if ident == "filep" else False 
                 )
-                await query.answer('Check PM, I have sent files in pm', show_alert=True)
+                if AUTO_DELETE is True:
+                    try:
+                        await query.answer('Check PM, I have sent files in pm & it will be deleted in {ADL_TIME}, save somewhere', show_alert=True)
+                        await asyncio.sleep(ADL_TIME)
+                        await adlt.delete()
+                    except Exception as e:
+                        logger.exception(e)
+                else:
+                    await query.answer('Check PM, I have sent files in pm', show_alert=True)
         except UserIsBlocked:
             await query.answer('Unblock the bot mahn !', show_alert=True)
         except PeerIdInvalid:
@@ -394,12 +402,20 @@ async def cb_handler(client: Client, query: CallbackQuery):
         if f_caption is None:
             f_caption = f"{title}"
         await query.answer()
-        await client.send_cached_media(
+        jkk = await client.send_cached_media(
             chat_id=query.from_user.id,
             file_id=file_id,
             caption=f_caption,
             protect_content=True if ident == 'checksubp' else False
-        )
+        )      
+        if AUTO_DELETE is True:
+            try:
+                await asyncio.sleep(ADLT_TIME)
+                await jkk.delete()
+            except Exception as e:
+                logger.exception(e)
+        else:
+            None
     elif query.data == "pages":
         await query.answer()
     elif query.data == "start":
