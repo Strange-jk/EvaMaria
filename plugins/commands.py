@@ -137,12 +137,21 @@ async def start(client, message):
             if f_caption is None:
                 f_caption = f"{title}"
             try:
-                await client.send_cached_media(
-                    chat_id=message.from_user.id,
+                adlt = await client.send_cached_media(
+                    chat_id=message.from_user.id,                  
                     file_id=msg.get("file_id"),
                     caption=f_caption,
                     protect_content=msg.get('protect', False),
                     )
+                
+                if AUTO_DELETE is True:
+                    try:
+                        await asyncio.sleep(ADL_TIME)
+                        await adlt.delete() 
+                    except Exception as e:
+                        return
+                else:
+                    await query.answer("No Delete in PM Heppy Aayile", show_alert=True)
             except FloodWait as e:
                 await asyncio.sleep(e.x)
                 logger.warning(f"Floodwait of {e.x} sec.")
@@ -240,12 +249,20 @@ async def start(client, message):
             f_caption=f_caption
     if f_caption is None:
         f_caption = f"{files.file_name}"
-    await client.send_cached_media(
+    adlt = await client.send_cached_media(
         chat_id=message.from_user.id,
         file_id=file_id,
         caption=f_caption,
         protect_content=True if pre == 'filep' else False,
         )
+    if AUTO_DELETE is True:
+        try:
+            await asyncio.sleep(ADL_TIME)
+            await adlt.delete()
+        except Exception as e:
+            return
+    else:
+        await query.answer("No Delete Heppy in PM Aayile", show_alert=True)
                     
 
 @Client.on_message(filters.command('channel') & filters.user(ADMINS))
@@ -342,18 +359,12 @@ async def delete_all_index(bot, message):
         reply_markup=InlineKeyboardMarkup(
             [
                 [
-                    InlineKeyboardButton(
-                        text="YES", callback_data="autofilter_delete"
-                    )
-                ],
-                [
-                    InlineKeyboardButton(
-                        text="CANCEL", callback_data="close_data"
-                    )
+                    InlineKeyboardButton( text="YES", callback_data="autofilter_delete")
+                ],[
+                    InlineKeyboardButton(text="CANCEL", callback_data="close_data")
                 ],
             ]
-        ),
-        quote=True,
+        ),quote=True,
     )
 
 
